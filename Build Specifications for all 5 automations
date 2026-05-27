@@ -1,0 +1,131 @@
+**Here are detailed, build-ready specifications for the five high-ROI automations.** Each includes:
+
+- **Google Sheets Template Structure** (master data hub — simple & free).
+- **Module-by-module Make.com flow** (optimized for free tier: scheduled/low-volume triggers, ≤2 active scenarios per client, batching).
+- **Sample OpenAI prompts** (use sparingly for cost/ops control; start rule-based where possible).
+- **Key SA notes & free-tier tips**.
+
+Build one at a time. Test with sample data. Export scenario blueprints (JSON) for client handoff + record Loom videos.
+
+### **1. Speed-to-Lead Automation (Instant Response System)**
+
+**Google Sheets Template** (Name: "Lead Master Hub"):
+- **Tabs**: Leads (main), Qualified, Booked.
+- **Columns (Leads tab)**: Timestamp | Source | Name | Phone | Email | Message/Inquiry | Budget/Timeline | Service Type | Lead Score | Status | Notes | Owner Assigned.
+
+**Make.com Module Flow**:
+1. **Trigger**: WhatsApp Business Cloud - Watch Incoming Messages **OR** Google Forms - Watch Responses **OR** Facebook Lead Ads - New Lead.
+2. **Google Sheets** - Add Row (log raw lead to Leads tab).
+3. **OpenAI** (optional light qualify) or Router/Filter based on keywords.
+4. **OpenAI** - Create Completion (personalized reply).
+5. **WhatsApp Business Cloud** - Send Message (instant confirmation + 2-3 qualifying questions + booking link).
+6. **Google Sheets** - Update Row (add score/status).
+7. **Router** → Hot leads: Create Google Calendar event + Notify owner via WhatsApp with full context.
+8. **Error Handler**: Email/Slack alert on failure.
+
+**Sample OpenAI Prompt**:
+"Act as a helpful SA [business type] receptionist. Create a friendly, professional WhatsApp reply for this inquiry: [paste details]. Confirm receipt, ask 2 qualifying questions (budget/timeline/service), offer next step. Keep under 120 words. Tone: warm & professional."
+
+**Free Tier Tip**: Use form/webhook triggers + daily summary instead of every message if ops are tight.
+
+---
+
+### **2. Document Processing Automation (Invoice & Paperwork Handler)**
+
+**Google Sheets Template** (Name: "Document Processing Hub"):
+- **Tabs**: Incoming Docs, Processed, Exceptions, Chart of Accounts.
+- **Columns (Incoming)**: Timestamp | Source (Email/WhatsApp) | File Link | Vendor | Amount | Date | VAT | Category | Status | Notes.
+
+**Make.com Module Flow**:
+1. **Trigger**: Gmail - Watch Emails (with attachments) **OR** WhatsApp Business Cloud - Watch Media/Documents.
+2. **HTTP** or OpenAI - Extract text from PDF/image (or use Make's PDF tools).
+3. **OpenAI** - Structured extraction.
+4. **Google Sheets** - Add Row (raw data).
+5. **Router/Filter**: Validate (match Chart of Accounts tab).
+6. **Google Sheets** - Update Row or Xero - Create Invoice/Bill (if connected).
+7. **WhatsApp/Email** - Notify owner of exceptions only.
+8. **Google Drive** - Archive original file.
+
+**Sample OpenAI Prompt**:
+"Extract from this invoice text: Vendor/Supplier name, Invoice Number, Date, Total Amount (incl VAT), VAT Amount, Line items summary, Due Date. Output in clean JSON. SA VAT rules apply. Text: [paste extracted text]."
+
+**SA Notes**: Heavy on supplier invoices via WhatsApp/email. Start rule-based (regex/filters) before heavy AI.
+
+---
+
+### **3. Follow-up & Nurture Sequences**
+
+**Google Sheets Template** (Name: "Nurture Hub"):
+- **Tabs**: Active Leads, Sequences, History.
+- **Columns**: Lead ID | Name | Phone | Stage | Last Contact | Next Action Due | Sequence Name | Status | Notes.
+
+**Make.com Module Flow**:
+1. **Trigger**: Google Sheets - Watch New/Updated Rows (new lead from Speed-to-Lead) **OR** Scheduler (daily check for due follow-ups).
+2. **Google Sheets** - Get Row(s).
+3. **Router** based on stage/days since last contact.
+4. **OpenAI** (optional personalization).
+5. **WhatsApp Business Cloud** - Send Message (or Email).
+6. **Google Sheets** - Update Row (log sent + next due date).
+7. **Filter** → If reply detected (via WhatsApp watch): Stop sequence + Notify owner.
+8. **Delay** modules for multi-touch (Day 1, Day 3, Day 7, etc.).
+
+**Sample OpenAI Prompt**:
+"Write a personalized WhatsApp follow-up for a [service] lead who inquired about [details] [X days] ago. Reference their interest. Provide value + soft call-to-action. Tone: helpful, not salesy. Max 100 words."
+
+**Tip**: Start with 3–5 fixed templates, then layer AI.
+
+---
+
+### **4. Database Reactivation**
+
+**Google Sheets Template** (Name: "Reactivation Hub"):
+- **Tabs**: Database, Segments, Campaigns, Responses.
+- **Columns**: Contact ID | Name | Phone | Email | Last Interaction Date | Status (Churned/Trial/Past) | Segment | History Notes | Reactivation Score.
+
+**Make.com Module Flow**:
+1. **Trigger**: Scheduler (weekly or monthly).
+2. **Google Sheets** - Get Rows (filter inactive >90 days).
+3. **Iterator** + Aggregator for segmentation.
+4. **OpenAI** - Personalize message per segment.
+5. **WhatsApp** or Email - Send win-back message.
+6. **Google Sheets** - Log sent + update status.
+7. **WhatsApp Watch** - Monitor replies → Route hot ones to owner + stop sequence.
+
+**Sample OpenAI Prompt**:
+"Create a warm re-engagement WhatsApp message for a past [gym/coach] client. Reference their last visit/service [history]. Offer a special win-back incentive. Friendly & personal tone. Under 100 words. History: [paste]."
+
+**SA Notes**: Great for gyms, coaches, retailers with old customer lists.
+
+---
+
+### **5. Internal Reporting & Status Notifications**
+
+**Google Sheets Template** (Name: "Business Intelligence Hub"):
+- **Tabs**: Raw Data (sales/invoices), KPIs, Reports Log.
+- **Columns**: Date | Metric (Sales, Overdue, Pipeline, etc.) | Value | Notes.
+
+**Make.com Module Flow**:
+1. **Trigger**: Scheduler (daily 8 AM or weekly Monday).
+2. **Google Sheets / Xero** - Get multiple ranges or rows.
+3. **Aggregator/Iterator** - Calculate KPIs (overdue, cash position, conversion rate, etc.).
+4. **OpenAI** - Generate plain-language summary.
+5. **WhatsApp Business Cloud** - Send formatted report + alerts.
+6. **Router** → Critical issues: Extra urgent message + task creation.
+7. **Google Sheets** - Log the report sent.
+
+**Sample OpenAI Prompt**:
+"You are a SA small business advisor. Create a short, actionable WhatsApp daily/weekly report from this data: [paste KPIs]. Highlight risks (cash/overdue), wins, and exactly 3 recommended actions. Use bullet points. Professional but encouraging tone. Under 250 words."
+
+**Free Tier Tip**: One daily/weekly scenario covers most clients initially.
+
+---
+
+**General Implementation Advice (Zero Budget)**:
+- **Start Simple**: Build rule-based versions first (Filters/Routers/Delays), add OpenAI later.
+- **Data Hub Rule**: Client owns & updates the master Google Sheet; you automate from it.
+- **POPIA**: Use consent language, minimize stored data, aggregated summaries.
+- **Testing**: Use your own test Sheet + WhatsApp Business test number.
+- **Handoff**: Blueprint JSON + Loom (step-by-step for client) + Sheet template copy.
+
+These are directly actionable and match the "simple, boring, but highly paid" workflows from the transcript. They deliver clear ROI math for selling.
+
