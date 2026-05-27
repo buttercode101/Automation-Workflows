@@ -1,0 +1,30 @@
+{
+  "name": "Speed-to-Lead Starter",
+  "version": 1,
+  "notes": "Template scaffold for Make blueprint import. Replace module IDs/connection IDs after import.",
+  "scenarios": [
+    {
+      "name": "[Client] - Incoming Leads Processor",
+      "modules": [
+        {"key": "M1", "app": "google-forms", "action": "watchResponses"},
+        {"key": "M2", "app": "tools", "action": "setVariable", "var": "lead_id", "value": "LD-{{formatDate(now; \"YYMMDD\")}}-{{random}}"},
+        {"key": "M3", "app": "tools", "action": "setVariable", "var": "phone_clean", "value": "ZA_E164_NORMALIZE"},
+        {"key": "M4", "app": "google-sheets", "action": "addRow", "sheet": "Leads"},
+        {"key": "M5", "app": "flow", "action": "router", "routes": ["HOT", "STANDARD"]},
+        {"key": "M6", "app": "whatsapp-cloud", "action": "sendMessage", "template": "lead_instant"},
+        {"key": "M7", "app": "whatsapp-cloud", "action": "sendMessage", "template": "owner_alert"},
+        {"key": "M8", "app": "google-sheets", "action": "updateRow"}
+      ]
+    },
+    {
+      "name": "[Client] - Follow-up Engine",
+      "modules": [
+        {"key": "F1", "app": "scheduler", "action": "dailyWeekday0900"},
+        {"key": "F2", "app": "google-sheets", "action": "searchRowsDue"},
+        {"key": "F3", "app": "flow", "action": "iterator"},
+        {"key": "F4", "app": "whatsapp-cloud", "action": "sendMessage", "template": "followup_ladder"},
+        {"key": "F5", "app": "google-sheets", "action": "updateRow"}
+      ]
+    }
+  ]
+}
